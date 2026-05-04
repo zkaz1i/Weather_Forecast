@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Glass</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body
+    data-weather="{{ weather.condition if weather else '' }}"
+    data-use-24h="{{ 'true' if use_24h_clock else 'false' }}"
+    data-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}"
+    data-favorite-city="{{ weather.city if weather and current_user.is_authenticated else '' }}"
+    data-is-favorite="{{ 'true' if is_favorite_city else 'false' }}"
+>
+    <div class="animated-bg" aria-hidden="true">
+        <video id="weatherVideo" class="weather-video" autoplay muted loop playsinline></video>
+        <div class="sky-overlay"></div>
+    </div>
+
+    <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+    <aside class="side-drawer" id="sideDrawer" aria-label="Menu">
+        <div class="drawer-header">
+            <h2>Menu</h2>
+            <button type="button" class="drawer-close" id="drawerClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-list drawer-flash">
+            {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <div class="drawer-section">
+            <h3><i class="fa-solid fa-user"></i> Account</h3>
+            {% if current_user.is_authenticated %}
+            <p class="drawer-email">{{ current_user.email }}</p>
+            <form method="post" action="{{ url_for('logout') }}" class="inline-form">
+                <button type="submit" class="drawer-btn secondary">Log out</button>
+            </form>
+            {% else %}
+            <div class="drawer-actions">
+                <a class="drawer-btn" href="{{ url_for('login') }}">Log in</a>
+                <a class="drawer-btn secondary" href="{{ url_for('signup') }}">Sign up</a>
+            </div>
+            <p class="drawer-hint">Sign in to save favourites and preferences.</p>
+            {% endif %}
+        </div>
+
+        <div class="drawer-section">
+            <h3><i class="fa-solid fa-location-crosshairs"></i> My location</h3>
+            <p class="drawer-hint">Use your device location for current weather and forecast.</p>
+            <button type="button" class="drawer-btn" id="useMyLocationBtn"><i class="fa-solid fa-map-pin"></i> Weather here</button>
+        </div>
+
+        {% if current_user.is_authenticated %}
+        <div class="drawer-section">
+            <h3><i class="fa-solid fa-star"></i> Favourite cities</h3>
+            {% if favorites %}
+            <ul class="favorites-list" id="favoritesList">
+                {% for fav in favorites %}
+                <li>
+                    <a href="{{ url_for('index', city=fav) }}">{{ fav }}</a>
+                    <button type="button" class="fav-remove" data-city="{{ fav }}" aria-label="Remove {{ fav }}"><i class="fa-solid fa-trash"></i></button>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="drawer-hint" id="favoritesEmpty">No favourites yet. Search a city and tap “Add to favourites”.</p>
+            <ul class="favorites-list hidden" id="favoritesList"></ul>
+            {% endif %}
+        </div>
+
+        <div class="drawer-section">
+            <h3><i class="fa-solid fa-house"></i> Default city</h3>
+            <p class="drawer-hint">Loaded when you open the app without searching.</p>
+            <div class="pref-row">
+                <input type="text" id="defaultCityInput" placeholder="e.g. London" value="{{ default_city }}">
+                <button type="button" class="drawer-btn secondary" id="saveDefaultCityBtn">Save</button>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h3><i class="fa-solid fa-sliders"></i> Preferences</h3>
+            <label class="toggle-line">
+                <span>Temperature</span>
+                <span class="segmented" id="tempUnitSeg">
+                    <button type="button" data-celsius="true" class="seg-btn {% if use_celsius %}active{% endif %}">°C</button>
+                    <button type="button" data-celsius="false" class="seg-btn {% if not use_celsius %}active{% endif %}">°F</button>
+                </span>
+            </label>
+            <label class="toggle-line">
+                <span>Clock</span>
+                <span class="segmented" id="clockSeg">
+                    <button type="button" data-hour24="false" class="seg-btn {% if not use_24h_clock %}active{% endif %}">12h</button>
+                    <button type="button" data-hour24="true" class="seg-btn {% if use_24h_clock %}active{% endif %}">24h</button>
+                </span>
+            </label>
+            <p class="drawer-hint pref-note" id="prefNote"></p>
+        </div>
+        {% endif %}
+    </aside>
+
+    <main class="app-shell">
+        <header class="top-bar">
+            <button type="button" class="menu-btn" id="menuOpen" aria-label="Open menu">
+                <span class="menu-bar"></span>
+                <span class="menu-bar"></span>
+                <span class="menu-bar"></span>
+            </button>
+            <h1 class="city-name">{{ weather.city if weather else "Search City" }}</h1>
+            <span class="top-bar-spacer" aria-hidden="true"></span>
+        </header>
+
+        {% if alert %}
+        <p class="alert-banner">{{ alert }}</p>
+        {% endif %}
+
+        <form class="city-form" method="GET" action="{{ url_for('index') }}">
+            <input type="text" name="city" placeholder="Search city..." value="{{ city }}" autocomplete="off">
+            <button type="submit">Go</button>
+        </form>
+
+        {% if weather and current_user.is_authenticated %}
+        <div class="favorite-bar">
+            <button type="button" class="fav-toggle-btn" id="addFavoriteBtn" data-city="{{ weather.city }}">
+                <i class="fa-{% if is_favorite_city %}solid{% else %}regular{% endif %} fa-star"></i>
+                <span id="favBtnLabel">{% if is_favorite_city %}Saved{% else %}Add to favourites{% endif %}</span>
+            </button>
+        </div>
+        {% endif %}
+
+        {% if weather %}
+        <section class="hero-weather">
+            <div class="hero-content">
+                <div class="hero-main-line">
+                    <p class="hero-temp">{{ weather.temp }}{{ weather.temp_unit }}</p>
+                    <div class="hero-datetime">
+                        <p id="currentTime"></p>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+                <p class="hero-high-low">High: {{ weather.temp_max }}{{ weather.temp_unit }}  Low: {{ weather.temp_min }}{{ weather.temp_unit }}</p>
+                <p class="condition">{{ weather.condition }}</p>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if weather and weather.hourly %}
+        <section class="glass-card forecast-section wide-card">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-cloud-bolt"></i> Hourly weather</h2>
+                <div class="forecast-tabs">
+                    <button type="button" class="tab-btn active" data-target="today">Today</button>
+                    <button type="button" class="tab-btn" data-target="next">Next day</button>
+                </div>
+            </div>
+
+            <div class="hourly-row active" id="hourly-today">
+                {% for item in weather.hourly %}
+                <div class="mini-card">
+                    <p>{{ item.time }}</p>
+                    <img src="https://openweathermap.org/img/wn/{{ item.icon }}.png" alt="">
+                    <p>{{ item.temp }}{{ weather.temp_unit }}</p>
+                </div>
+
+                {% if loop.index == 5 %}
+                <div class="mini-card sunset">
+                    <p>6:27 PM</p>
+                    <p class="sunset-label">Sunset</p>
+                    <p>--</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="hourly-row" id="hourly-next"></div>
+        </section>
+        {% endif %}
+
+        {% if weather and weather.weekly %}
+        <section class="glass-card forecast-section wide-card">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-calendar-days"></i> Weather forecast</h2>
+                <div class="forecast-tabs">
+                    <button type="button" class="tab-btn active" data-week-target="week">This week</button>
+                    <button type="button" class="tab-btn" data-week-target="nextdays">Next days</button>
+                </div>
+            </div>
+
+            <div class="weekly-row active" id="weekly-all">
+                {% for day in weather.weekly %}
+                <div class="week-card">
+                    <p>{{ day.day }}</p>
+                    <img src="https://openweathermap.org/img/wn/{{ day.icon }}.png" alt="">
+                    <p>{{ day.high }}{{ weather.temp_unit }} / {{ day.low }}{{ weather.temp_unit }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="weekly-row" id="weekly-next"></div>
+            <button class="extended-btn" type="button" id="extendedToggle">Extended forecast</button>
+            <div class="extended-panel" id="extendedPanel">
+                {% for day in weather.weekly %}
+                <div class="extended-item">
+                    <div>
+                        <strong>{{ day.day }}</strong>
+                        <p>{{ day.condition }}</p>
+                    </div>
+                    <div class="ext-temps">{{ day.high }}{{ weather.temp_unit }} / {{ day.low }}{{ weather.temp_unit }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="story-card glass-card">
+            <h3><i class="fa-solid fa-images"></i> Weather story</h3>
+            <p>Now playing: New weather updates near {{ weather.city if weather else "your city" }}</p>
+            <div class="story-thumbs">
+                <img src="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=300&q=70" alt="Sky view">
+                <img src="https://images.unsplash.com/photo-1592210454359-9043f067919b?auto=format&fit=crop&w=300&q=70" alt="Cloud view">
+                <img src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=300&q=70" alt="Rain cloud">
+            </div>
+        </section>
+
+        {% if weather and weather.info %}
+        <section class="info-grid wide-card">
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-sun"></i> UV Index</h3>
+                <p>{{ weather.info.uv }}</p>
+                <span>Use sunscreen</span>
+            </div>
+
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-temperature-half"></i> Feels like</h3>
+                <p>{{ weather.info.feels_like }}</p>
+                <span>Actual sensation</span>
+            </div>
+
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-wind"></i> Wind</h3>
+                <p>{{ weather.info.wind }}</p>
+                <span>Moving gently</span>
+            </div>
+
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-droplet"></i> Humidity</h3>
+                <p>{{ weather.info.humidity }}</p>
+                <span>Comfort level</span>
+            </div>
+
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-eye"></i> Visibility</h3>
+                <p>{{ weather.info.visibility }}</p>
+                <span>Explore safely</span>
+            </div>
+
+            <div class="glass-card info-card">
+                <h3><i class="fa-solid fa-gauge-high"></i> Pressure</h3>
+                <p>{{ weather.info.pressure }}</p>
+                <span>Stable atmosphere</span>
+            </div>
+
+            <div class="glass-card info-card astronomy-card">
+                <h3><i class="fa-solid fa-sun-plant-wilt"></i> Sunrise & Sunset</h3>
+                <p>6:12 PM</p>
+                <span>Sunrise: 5:47 AM</span>
+            </div>
+
+            <div class="glass-card info-card astronomy-card">
+                <h3><i class="fa-solid fa-moon"></i> Moon Phase</h3>
+                <div class="moon-image"></div>
+                <p>Waning gibbous</p>
+                <span>93% illumination</span>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="lifestyle-row wide-card">
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-umbrella"></i> Umbrella</h4>
+                <p>Low chance of rain</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-car-side"></i> Driving</h4>
+                <p>Roads look clear</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-person-running"></i> Running</h4>
+                <p>Great evening jog</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-star"></i> Stargazing</h4>
+                <p>Average visibility</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-fish"></i> Fishing</h4>
+                <p>Good surface activity</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-person-hiking"></i> Hiking</h4>
+                <p>Suitable for hiking</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-shirt"></i> Clothing</h4>
+                <p>Short sleeves recommended</p>
+            </article>
+            <article class="glass-card life-card">
+                <h4><i class="fa-solid fa-plane-departure"></i> Flight</h4>
+                <p>Low chance of delays</p>
+            </article>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

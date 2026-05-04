@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up — Weather Glass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="animated-bg" aria-hidden="true">
+        <div class="sky-overlay"></div>
+    </div>
+    <main class="auth-shell glass-card">
+        <a class="auth-back" href="{{ url_for('index') }}"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <h1>Create account</h1>
+        <p class="auth-lead">Save favourite cities, a default location, and how you like temperatures and time shown.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-list">
+            {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <form class="auth-form" method="post" action="{{ url_for('signup') }}">
+            <label>
+                <span>Email</span>
+                <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            </label>
+            <label>
+                <span>Password</span>
+                <input type="password" name="password" required autocomplete="new-password" placeholder="At least 6 characters" minlength="6">
+            </label>
+            <label>
+                <span>Confirm password</span>
+                <input type="password" name="password2" required autocomplete="new-password" placeholder="Repeat password" minlength="6">
+            </label>
+            <button type="submit" class="auth-submit">Sign up</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    </main>
+</body>
+</html>
