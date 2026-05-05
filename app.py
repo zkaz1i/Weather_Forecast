@@ -487,6 +487,11 @@ def index():
         favorites_json=json.dumps(favorites),
     )
 
+@app.route("/debug-files")
+def debug_files():
+    import os
+    return "<br>".join(os.listdir("static/videos"))
+
 with app.app_context():
     db.create_all()
 
