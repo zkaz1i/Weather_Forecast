@@ -19,7 +19,18 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 load_dotenv()
 
+import traceback
+print("🔥 App is importing...")
+
+try:
+    print("🔧 Starting Flask setup...")
+except Exception as e:
+    print("❌ Import error:")
+    traceback.print_exc()
+
 print("App starts")
+
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
