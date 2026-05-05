@@ -474,10 +474,6 @@ def index():
         favorites_json=json.dumps(favorites),
     )
 
-@app.route("/health")
-def health():
-    return "OK"
-
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT",8080))
