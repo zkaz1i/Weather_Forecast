@@ -21,9 +21,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
-instance_path = Path(__file__).resolve().parent / "instance"
-instance_path.mkdir(exist_ok=True)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{instance_path / 'weather.db'}"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -475,9 +473,8 @@ def index():
     )
 
 
-with app.app_context():
-    db.create_all()
-
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT",5000))
+    app.run(host="0.0.0.0", port=port)
