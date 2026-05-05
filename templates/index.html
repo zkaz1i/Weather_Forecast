@@ -19,7 +19,9 @@
     data-is-favorite="{{ 'true' if is_favorite_city else 'false' }}"
 >
     <div class="animated-bg" aria-hidden="true">
-        <video id="weatherVideo" class="weather-video" autoplay muted loop playsinline></video>
+        <video id="weatherVideo" class="weather-video" autoplay muted loop playsinline>
+            <source src="{{ url_for('static', filename='videos/sunny_day.mp4') }}" type="video/mp4">
+        </video>
         <div class="sky-overlay"></div>
     </div>
 
