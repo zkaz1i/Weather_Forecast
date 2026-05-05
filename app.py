@@ -19,6 +19,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 load_dotenv()
 
+print("App starts")
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
