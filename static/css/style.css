@@ -17,7 +17,7 @@ body {
 .animated-bg {
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: -1;
     background: #122348;
 }
 
@@ -42,12 +42,10 @@ body {
 }
 
 .app-shell {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    padding: 16px 14px 34px;
-    display: grid;
-    gap: 12px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px;
 }
 
 .top-bar {
