@@ -509,6 +509,12 @@ def debug_file_size():
     path = os.path.join("static/videos", "clouds_day.mp4")
     return str(os.path.getsize(path))
 
+@app.route("/debug-real-file")
+def debug_real_file():
+    import os
+    path = os.path.join(os.getcwd(), "static/videos/clouds_day.mp4")
+    return str(os.path.exists(path)) + " | " + str(os.path.getsize(path))
+
 with app.app_context():
     db.create_all()
 
