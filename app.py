@@ -34,7 +34,7 @@ print("App starts")
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", static_url_path="/static")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
