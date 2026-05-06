@@ -35,6 +35,17 @@ print("App starts")
 
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+from flask import send_from_directory
+
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    safe_path = os.path.normpath(filename).lstrip(os.sep)
+    return send_from_directory(os.path.join(BASE_DIR, "static"),
+                                safe_path)
+    
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
