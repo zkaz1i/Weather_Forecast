@@ -246,22 +246,22 @@ function getWeatherVideoSet() {
         },
         "weather-sunny": {
             day: ["/static/videos/sunny_day_fixed.mp4"],
-            night: ["/static/videos/clear_night.mp4"],
+            night: ["/static/videos/clear_night_fixed.mp4"],
         },
         "weather-clouds": {
             day: ["/static/videos/clouds_day_fixed.mp4"],
-            night: ["/static/videos/clouds_night.mp4"],
+            night: ["/static/videos/clouds_night_fixed.mp4"],
         },
         "weather-rain": {
-            day: ["/static/videos/rain_day.mp4"],
+            day: ["/static/videos/rain_day_fixed.mp4"],
             night: ["/static/videos/rain_night_fixed.mp4"],
         },
         "weather-drizzle": {
             day: ["/static/videos/drizzle_day_fixed.mp4"],
-            night: ["/static/videos/drizzle_night.mp4"],
+            night: ["/static/videos/drizzle_night_fixed.mp4"],
         },
         "weather-thunderstorm": {
-            day: ["/static/videos/thunderstorm_day.mp4"],
+            day: ["/static/videos/thunderstorm_day_fixed.mp4"],
             night: ["/static/videos/thunderstorm_night_fixed.mp4"],
         },
         "weather-snow": {
@@ -269,7 +269,7 @@ function getWeatherVideoSet() {
             night: ["/static/videos/snow_night_fixed.mp4"],
         },
         "weather-mist": {
-            day: ["/static/videos/mist_day.mp4"],
+            day: ["/static/videos/mist_day_fixed.mp4"],
             night: ["/static/videos/mist_night_fixed.mp4"],
         },
     };
