@@ -302,9 +302,7 @@ function applyWeatherVideo(weatherClass, timeClass) {
 
     weatherVideo.onloadeddata = () => {
         weatherVideo.classList.add("ready");
-        weatherVideo.play().catch((err) => {
-            console.warn("Video autoplay blocked or failed:", err);
-        });
+        weatherVideo.play().catch(() => {});
     };
     weatherVideo.onerror = () => {
         tryLoad();
