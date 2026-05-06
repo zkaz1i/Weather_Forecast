@@ -276,39 +276,21 @@ function getWeatherVideoSet() {
 }
 
 function applyWeatherVideo(weatherClass, timeClass) {
-    if (!weatherVideo) return;
+    const v = document.getElementById("weatherVideo");
 
-    const sets = getWeatherVideoSet();
-    const dayNightKey = timeClass === "daytime" ? "day" : "night";
-    const selected = sets[weatherClass] || sets["weather-clear"];
-    const candidates = selected[dayNightKey];
-    let index = 0;
+    if (!v) return;
 
-    const tryLoad = () => {
-        if (index >= candidates.length) {
-            return;
-        }
-        const src = candidates[index];
-        index += 1;
-        weatherVideo.classList.remove("ready");
-        weatherVideo.src = src;
-        weatherVideo.load();
-    };
+    const src = "/static/videos/clouds_day_fixed.mp4";
 
-    weatherVideo.muted = true;
-    weatherVideo.autoplay = true;
-    weatherVideo.loop = true;
-    weatherVideo.playsInline = true;
+    v.pause();
+    v.removeAttribute("src");
+    v.load();
 
-    weatherVideo.onloadeddata = () => {
-        weatherVideo.classList.add("ready");
-        weatherVideo.play().catch(() => {});
-    };
-    weatherVideo.onerror = () => {
-        tryLoad();
-    };
-
-    tryLoad();
+    setTimeout(() => {
+        v.src = src;
+        v.load();
+        v.play().catch(err => console.log("Video error:", err));
+    }, 100);
 }
 
 if (form) {
