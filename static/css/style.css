@@ -45,7 +45,8 @@ body {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 16px;
+    padding: 16px 14px 34px;
+    gap: 12px
 }
 
 .top-bar {
