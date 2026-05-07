@@ -288,35 +288,35 @@
         <section class="lifestyle-row wide-card">
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-umbrella"></i> Umbrella</h4>
-                <p>Low chance of rain</p>
+                <p>{{ weather.lifestyle.umbrella if weather and weather.lifestyle else "Low chance of rain" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-car-side"></i> Driving</h4>
-                <p>Roads look clear</p>
+                <p>{{ weather.lifestyle.driving if weather and weather.lifestyle else "Roads look clear" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-person-running"></i> Running</h4>
-                <p>Great evening jog</p>
+                <p>{{ weather.lifestyle.running if weather and weather.lifestyle else "Great evening jog" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-star"></i> Stargazing</h4>
-                <p>Average visibility</p>
+                <p>{{ weather.lifestyle.stargazing if weather and weather.lifestyle else "Average visibility" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-fish"></i> Fishing</h4>
-                <p>Good surface activity</p>
+                <p>{{ weather.lifestyle.fishing if weather and weather.lifestyle else "Good surface activity" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-person-hiking"></i> Hiking</h4>
-                <p>Suitable for hiking</p>
+                <p>{{ weather.lifestyle.hiking if weather and weather.lifestyle else "Suitable for hiking" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-shirt"></i> Clothing</h4>
-                <p>Short sleeves recommended</p>
+                <p>{{ weather.lifestyle.clothing if weather and weather.lifestyle else "Short sleeves recommended" }}</p>
             </article>
             <article class="glass-card life-card">
                 <h4><i class="fa-solid fa-plane-departure"></i> Flight</h4>
-                <p>Low chance of delays</p>
+                <p>{{ weather.lifestyle.flight if weather and weather.lifestyle else "Low chance of delays" }}</p>
             </article>
         </section>
     </main>

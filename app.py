@@ -172,6 +172,114 @@ def build_weekly(forecast_items: list) -> list:
     return weekly
 
 
+def build_lifestyle(weather_data: dict) -> dict:
+    weather_main = ((weather_data.get("weather") or [{}])[0].get("main") or "").lower()
+    temp = float((weather_data.get("main") or {}).get("temp", 20))
+    wind_speed = float((weather_data.get("wind") or {}).get("speed", 0))
+    visibility = int(weather_data.get("visibility", 10000))
+    cloud_coverage = int((weather_data.get("clouds") or {}).get("all", 0))
+    humidity = int((weather_data.get("main") or {}).get("humidity", 50))
+    pressure = int((weather_data.get("main") or {}).get("pressure", 1013))
+
+    is_thunder = "thunder" in weather_main
+    is_rain = weather_main in {"rain", "drizzle"} or "rain" in weather_main
+    is_snow = "snow" in weather_main
+    is_fog = weather_main in {"mist", "fog", "haze", "smoke", "dust", "sand", "ash"}
+    very_windy = wind_speed >= 12  # m/s
+    poor_visibility = visibility < 5000
+    very_hot = temp >= 35
+    hot = temp >= 30
+    cold = temp <= 10
+    dangerous_heat = temp >= 32 and humidity >= 75
+
+    if is_thunder or is_rain:
+        umbrella = "Carry an umbrella today."
+    elif is_snow:
+        umbrella = "Snow expected. Carry weather protection."
+    else:
+        umbrella = "Low chance of rain. Umbrella optional."
+
+    if is_thunder or is_snow or is_fog or poor_visibility:
+        driving = "Drive carefully; reduced visibility and slippery roads possible."
+    elif is_rain or very_windy:
+        driving = "Use caution while driving, especially on wet roads."
+    else:
+        driving = "Road conditions look good for driving."
+
+    if is_thunder or is_snow:
+        running = "Skip outdoor running for now."
+    elif dangerous_heat:
+        running = "Extreme heat and humidity. Avoid outdoor runnings for now."
+    elif very_hot:
+        running = "Avoid midday runs; choose early morning or evening."
+    elif is_rain or very_windy:
+        running = "Wet and windy conditions may make running uncomfortable."
+    elif is_fog or poor_visibility:
+        running = "Run with caution; visibility is poor."
+    elif is_rain:
+        running = "Running possible, but expect wet conditions."
+    else:
+        running = "Great conditions for an outdoor run."
+
+    if is_thunder or is_rain or is_fog:
+        stargazing = "Poor stargazing conditions tonight."
+    elif cloud_coverage <= 20 and visibility >= 8000 and humidity < 70:
+        stargazing = "Excellent stargazing conditions."
+    elif cloud_coverage > 70:
+        stargazing = "Clouds will block most stars tonight."
+    else:
+        stargazing = "Fair stargazing with partial visibility."
+
+    if is_thunder or very_windy:
+        fishing = "Unsafe or poor fishing conditions."
+    elif pressure < 1005:
+        fishing = "Fish activity may be inconsistent due to low pressure."
+    elif cloud_coverage > 60:
+        fishing = "Cloud cover may improve fish activity."
+    else:
+        fishing = "Stable conditions for casual fishing."
+
+    if is_thunder or is_snow:
+        hiking = "Avoid hiking today due to unsafe weather."
+    elif very_hot:
+        hiking = "Avoid long hikes during peak afternoon heat."
+    elif is_rain or is_fog:
+        hiking = "Hike with caution; trails may be slippery."
+    else:
+        hiking = "Suitable weather for hiking."
+
+    if cold and very_windy:
+        clothing = "Wear warm layers and wind protection."
+    elif dangerous_heat:
+        clothing = "Light breathable clothes strongly recommended."
+    elif very_hot:
+        clothing = "Wear breathable clothing and stay hydrated."
+    elif humidity >= 85:
+        clothing = "Dress light; humidity may feel uncomfortable."
+    elif cold:
+        clothing = "Wear warm layers and a jacket."
+    else:
+        clothing = "Comfortable weather; light layers should work well."
+
+    if is_thunder or is_snow or poor_visibility:
+        flight = "Flight delays are possible due to weather."
+    elif very_windy or is_fog:
+        flight = "Possible minor flight disruptions; check status before travel."
+    else:
+        flight = "Low chance of flight delays."
+
+    return {
+        "umbrella": umbrella,
+        "driving": driving,
+        "running": running,
+        "stargazing": stargazing,
+        "fishing": fishing,
+        "hiking": hiking,
+        "clothing": clothing,
+        "flight": flight,
+    }
+
+
 def fallback_weather(city: str, use_celsius: bool, use_24h: bool) -> dict:
     now = datetime.now()
     unit = _deg_suffix(use_celsius)
@@ -220,6 +328,16 @@ def fallback_weather(city: str, use_celsius: bool, use_24h: bool) -> dict:
         "icon": "01d",
         "hourly": hourly,
         "weekly": weekly,
+        "lifestyle": {
+            "umbrella": "Low chance of rain. Umbrella optional.",
+            "driving": "Road conditions look good for driving.",
+            "running": "Great conditions for an outdoor run.",
+            "stargazing": "Fair stargazing; some clouds may interfere.",
+            "fishing": "Good conditions for fishing.",
+            "hiking": "Suitable weather for hiking.",
+            "clothing": "Comfortable weather; light layers should work well.",
+            "flight": "Low chance of flight delays.",
+        },
         "info": {
             "uv": "5.2",
             "humidity": "62%",
@@ -249,6 +367,7 @@ def _weather_from_api(current: dict, forecast: dict, use_celsius: bool, use_24h:
         "icon": current["weather"][0]["icon"],
         "hourly": build_hourly(forecast.get("list", []), timezone_offset, use_24h),
         "weekly": build_weekly(forecast.get("list", [])),
+        "lifestyle": build_lifestyle(current),
         "info": {
             "uv": "--",
             "humidity": f"{current['main']['humidity']}%",
