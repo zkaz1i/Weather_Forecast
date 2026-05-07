@@ -1,9 +1,5 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-* {
-    box-sizing: border-box;
-}
-
 :root {
     --text-main: #f4f8ff;
     --text-soft: rgba(225, 234, 248, 0.82);
@@ -11,16 +7,11 @@
     --card-border: rgba(170, 195, 233, 0.22);
 }
 
-html, body{
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
 body {
     min-height: 100vh;
     font-family: "Plus Jakarta Sans", sans-serif;
     color: var(--text-main);
+    overflow-x: hidden;
 }
 
 .animated-bg {
