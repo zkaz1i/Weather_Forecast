@@ -418,8 +418,16 @@ body.auth-page {
     justify-content: center;
     align-items: center;
     gap: 18px;
+    flex-wrap: wrap
 }
-.hero-temp { font-size: clamp(94px, 23vw, 172px); font-weight: 300; line-height: 1; }
+.hero-temp { 
+    font-size: clamp(94px, 23vw, 172px); 
+    font-weight: 300; 
+    line-height: 1;
+    max-width: 100%;
+    word-break: break-word;
+}
+
 .hero-datetime {
     text-align: left;
     min-width: 104px;
@@ -580,4 +588,8 @@ body.auth-page {
     .hero-datetime p:last-child { font-size: 0.8rem; }
     .hero-high-low, .condition { font-size: 1.45rem; }
     .lifestyle-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+* {
+    outline: 1px solid red;
 }
