@@ -572,118 +572,12 @@ body.auth-page {
     border-radius: 99px;
 }
 
-
 @media (max-width: 680px) {
-
-    body {
-        overflow-x: hidden;
-    }
-
-    .app-shell {
-        width: 100%;
-        padding: 16px;
-        box-sizing: border-box;
-    }
-
-    .city-name {
-        font-size: 1.9rem;
-        text-align: center;
-    }
-
-    .top-bar {
-        gap: 10px;
-    }
-
-    .hero-main-line {
-        gap: 12px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .hero-temp {
-        font-size: 4rem;
-        line-height: 1;
-    }
-
-    .hero-datetime {
-        min-width: 86px;
-    }
-
-    .hero-datetime p:first-child {
-        font-size: 1.25rem;
-    }
-
-    .hero-datetime p:last-child {
-        font-size: 0.8rem;
-    }
-
-    .hero-high-low,
-    .condition {
-        font-size: 1.1rem;
-    }
-
-    .glass-card,
-    .wide-card,
-    .story-card,
-    .life-card,
-    .info-card {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .lifestyle-row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hourly-row,
-    .weekly-row {
-        overflow-x: auto;
-        gap: 12px;
-        padding-bottom: 10px;
-    }
-
-    .mini-card,
-    .week-card {
-        min-width: 85px;
-        flex-shrink: 0;
-    }
-
-    .story-thumbs {
-        grid-template-columns: 1fr;
-    }
-
-    .story-thumbs img {
-        width: 100%;
-        height: auto;
-    }
-
-    .side-drawer {
-        width: 85%;
-        max-width: 320px;
-    }
-
-    .city-form {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .city-form input,
-    .city-form button {
-        width: 100%;
-    }
-
-    .forecast-tabs {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .extended-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-    }
+    .city-name { font-size: 1.9rem; }
+    .hero-main-line { gap: 12px; }
+    .hero-datetime { min-width: 86px; }
+    .hero-datetime p:first-child { font-size: 1.25rem; }
+    .hero-datetime p:last-child { font-size: 0.8rem; }
+    .hero-high-low, .condition { font-size: 1.45rem; }
+    .lifestyle-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
