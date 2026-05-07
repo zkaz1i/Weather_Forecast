@@ -14,6 +14,7 @@
 <body
     data-weather="{{ weather.condition if weather else '' }}"
     data-use-24h="{{ 'true' if use_24h_clock else 'false' }}"
+    data-local-hour="{{ weather.local_hour if weather else 12 }}"
     data-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}"
     data-favorite-city="{{ weather.city if weather and current_user.is_authenticated else '' }}"
     data-is-favorite="{{ 'true' if is_favorite_city else 'false' }}"
@@ -145,8 +146,8 @@
                 <div class="hero-main-line">
                     <p class="hero-temp">{{ weather.temp }}{{ weather.temp_unit }}</p>
                     <div class="hero-datetime">
-                        <p id="currentTime"></p>
-                        <p id="currentDate"></p>
+                        <p id="currentTime">{{ weather.local_time }}</p>
+                        <p id="currentDate">{{ weather.local_date }}</p>
                     </div>
                 </div>
                 <p class="hero-high-low">High: {{ weather.temp_max }}{{ weather.temp_unit }}  Low: {{ weather.temp_min }}{{ weather.temp_unit }}</p>

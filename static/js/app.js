@@ -8,8 +8,6 @@ const extendedPanel = document.getElementById("extendedPanel");
 const weeklyAll = document.getElementById("weekly-all");
 const weeklyNext = document.getElementById("weekly-next");
 const weekTabButtons = document.querySelectorAll("[data-week-target]");
-const timeNode = document.getElementById("currentTime");
-const dateNode = document.getElementById("currentDate");
 const weatherVideo = document.getElementById("weatherVideo");
 
 const menuOpen = document.getElementById("menuOpen");
@@ -26,10 +24,6 @@ const clockSeg = document.getElementById("clockSeg");
 const prefNote = document.getElementById("prefNote");
 const favoritesList = document.getElementById("favoritesList");
 const favoritesEmpty = document.getElementById("favoritesEmpty");
-
-function isUse24h() {
-    return body && body.dataset.use24h === "true";
-}
 
 function openDrawer() {
     if (sideDrawer) sideDrawer.classList.add("open");
@@ -324,7 +318,7 @@ if (form) {
 if (body) {
     const weatherText = (body.dataset.weather || "").toLowerCase();
     let weatherClass = "weather-clear";
-    const hour = new Date().getHours();
+    const hour = Number.parseInt(body.dataset.localHour || "12", 10);
     const timeClass = hour >= 6 && hour < 18 ? "daytime" : "nighttime";
 
     if (weatherText.includes("thunder")) {
@@ -352,31 +346,6 @@ if (body) {
 
     applyWeatherVideo(weatherClass, timeClass);
 }
-
-function updateDateTime() {
-    const now = new Date();
-    if (timeNode) {
-        if (isUse24h()) {
-            const h = String(now.getHours()).padStart(2, "0");
-            const m = String(now.getMinutes()).padStart(2, "0");
-            timeNode.textContent = `${h}:${m}`;
-        } else {
-            timeNode.textContent = now.toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-            });
-        }
-    }
-    if (dateNode) {
-        const dd = String(now.getDate()).padStart(2, "0");
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
-        const yyyy = now.getFullYear();
-        dateNode.textContent = `${dd}/${mm}/${yyyy}`;
-    }
-}
-
-updateDateTime();
-setInterval(updateDateTime, 1000);
 
 function buildNextDayRow() {
     if (!todayRow || !nextRow || nextRow.children.length > 0) {

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -116,17 +116,26 @@ def _format_hour(dt: datetime, use_24h: bool) -> str:
     return f"{hour}:{dt.strftime('%M %p')}"
 
 
-def _format_hour_from_api(hour_string: str, use_24h: bool) -> str:
-    dt = datetime.strptime(hour_string, "%Y-%m-%d %H:%M:%S")
-    return _format_hour(dt, use_24h)
+def _format_hour_from_api(
+    hour_string: str,
+    timezone_offset: int,
+    use_24h: bool
+) -> str:
+    dt = datetime.strptime(
+        hour_string,
+        "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=timezone.utc)
 
+    local_dt = dt + timedelta(seconds=timezone_offset)
 
-def build_hourly(forecast_items: list, use_24h: bool) -> list:
+    return _format_hour(local_dt, use_24h)
+
+def build_hourly(forecast_items: list, timezone_offset: int, use_24h: bool) -> list:
     hourly = []
     for item in forecast_items[:8]:
         hourly.append(
             {
-                "time": _format_hour_from_api(item["dt_txt"], use_24h),
+                "time": _format_hour_from_api(item["dt_txt"], timezone_offset, use_24h),
                 "temp": round(item["main"]["temp"]),
                 "condition": item["weather"][0]["main"],
                 "icon": item["weather"][0]["icon"],
@@ -200,6 +209,9 @@ def fallback_weather(city: str, use_celsius: bool, use_24h: bool) -> dict:
 
     return {
         "city": city.title(),
+        "local_time": now.strftime("%H:%M") if use_24h else now.strftime("%I:%M %p"),
+        "local_date": now.strftime("%d/%m/%Y"),
+        "local_hour": now.hour,
         "temp": t,
         "temp_max": tmax,
         "temp_min": tmin,
@@ -222,15 +234,20 @@ def fallback_weather(city: str, use_celsius: bool, use_24h: bool) -> dict:
 def _weather_from_api(current: dict, forecast: dict, use_celsius: bool, use_24h: bool) -> dict:
     wind_speed = current["wind"]["speed"]
     unit = _deg_suffix(use_celsius)
+    timezone_offset = current.get("timezone", 0)
+    local_time = datetime.now(timezone.utc) + timedelta(seconds=timezone_offset)
     return {
         "city": current.get("name", "Unknown"),
+        "local_time": local_time.strftime("%H:%M") if use_24h else local_time.strftime("%I:%M %p"),
+        "local_date": local_time.strftime("%d/%m/%Y"),
+        "local_hour": local_time.hour,
         "temp": round(current["main"]["temp"]),
         "temp_max": round(current["main"]["temp_max"]),
         "temp_min": round(current["main"]["temp_min"]),
         "temp_unit": unit,
         "condition": current["weather"][0]["description"].title(),
         "icon": current["weather"][0]["icon"],
-        "hourly": build_hourly(forecast.get("list", []), use_24h),
+        "hourly": build_hourly(forecast.get("list", []), timezone_offset, use_24h),
         "weekly": build_weekly(forecast.get("list", [])),
         "info": {
             "uv": "--",
