@@ -419,7 +419,7 @@ body.auth-page {
     align-items: center;
     gap: 18px;
 }
-.hero-temp { font-size: clamp(94px, 23vw, 172px); font-weight: 300; line-height: 1; }
+.hero-temp { font-size: clamp(52px, 18vw, 172px); font-weight: 300; line-height: 1; }
 .hero-datetime {
     text-align: left;
     min-width: 104px;
@@ -572,12 +572,50 @@ body.auth-page {
     border-radius: 99px;
 }
 
-@media (max-width: 680px) {
-    .city-name { font-size: 1.9rem; }
-    .hero-main-line { gap: 12px; }
-    .hero-datetime { min-width: 86px; }
-    .hero-datetime p:first-child { font-size: 1.25rem; }
-    .hero-datetime p:last-child { font-size: 0.8rem; }
-    .hero-high-low, .condition { font-size: 1.45rem; }
-    .lifestyle-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+video {
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+
+    .app-shell {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .hero-main-line {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .hero-datetime {
+        text-align: center;
+        min-width: unset;
+    }
+
+    .hero-high-low,
+    .condition {
+        font-size: 1.1rem;
+    }
+
+    .city-name {
+        font-size: 1.5rem;
+    }
+
+    .info-grid,
+    .lifestyle-row,
+    .story-thumbs {
+        grid-template-columns: 1fr;
+    }
+
+    .mini-card,
+    .week-card {
+        min-width: 72px;
+    }
 }
