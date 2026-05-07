@@ -1,5 +1,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --text-main: #f4f8ff;
     --text-soft: rgba(225, 234, 248, 0.82);
@@ -7,11 +11,16 @@
     --card-border: rgba(170, 195, 233, 0.22);
 }
 
+html, body{
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     min-height: 100vh;
     font-family: "Plus Jakarta Sans", sans-serif;
     color: var(--text-main);
-    overflow-x: hidden;
 }
 
 .animated-bg {
@@ -48,6 +57,10 @@ body {
     padding: 16px 14px 34px;
     display: grid;
     gap: 12px;
+
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .top-bar {
@@ -580,4 +593,26 @@ body.auth-page {
     .hero-datetime p:last-child { font-size: 0.8rem; }
     .hero-high-low, .condition { font-size: 1.45rem; }
     .lifestyle-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+
+    .info-grid,
+    .lifestyle-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hourly-row,
+    .weekly-row {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .hero-temp {
+        font-size: 4rem;
+    }
+
+    .city-name {
+        font-size: 1.8rem;
+    }
 }
